@@ -40,7 +40,12 @@
          </div>
       </div>
       <div class="display-inline">
+       
          <h3> Department List</h3>
+           <tr>
+           <td><input type="text" v-model="filterdeptname" placeholder="Enter department name"></td>
+           <td> <button @click="searchDept(1)">Search</button> </td>
+         </tr>
          <table>
             <thead>
                <tr>
@@ -60,6 +65,10 @@
       </div>
       <div class="display-inline">
          <h3> Employee List</h3>
+          <tr>
+           <td><input type="text" v-model="filterempname" placeholder="Enter employee name"></td>
+           <td> <button @click="searchEmp(1)">Search</button> </td>
+         </tr>
          <table>
             <thead>
                <tr>
@@ -84,7 +93,7 @@
    export default {
      name: 'Opration',
      data: () => ({
-       HOST_URL: 'http://localhost:8081',
+       HOST_URL: 'http://localhost:8081', //docker port
        emplist: [],
        deptlist: [],
        deptename: '',
@@ -93,16 +102,22 @@
        employeeid: '',
        isupdatedept: false,
        isupdateemp: false,
-       updatedeptid:''
+       updatedeptid:'',
+       filterdeptname: '',
+       filterempname: ''
      }),
     async created () { 
-   await this.searchDept()
-   await this.searchEmp()
+      await this.searchDept()
+      await this.searchEmp()
      },
      methods: {
-        searchEmp: async function () {
+        searchEmp: async function (issearch) {
            try {
-              let empresult = await axios.post(`${this.HOST_URL}/api/listemp`)
+              let getObj = {}
+              if(issearch) {
+                getObj.epmloyeename = this.filterempname
+              }
+              let empresult = await axios.post(`${this.HOST_URL}/api/listemp`, getObj)
               empresult = empresult.data
               if(empresult.status) {
                 this.emplist = empresult.data
@@ -111,9 +126,13 @@
              console.log(e)
            }
         },
-        searchDept: async function () {
+        searchDept: async function (issearch) {
           try {
-              let deptresult = await axios.post(`${this.HOST_URL}/api/listdept`)
+              let getObj = {}
+              if(issearch) {
+                getObj.departmentname = this.filterdeptname
+              }
+              let deptresult = await axios.post(`${this.HOST_URL}/api/listdept`, getObj)
               deptresult = deptresult.data
               if(deptresult.status) {
                 this.deptlist = deptresult.data
